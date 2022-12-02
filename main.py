@@ -2,22 +2,24 @@ import argparse
 import os
 import re
 
-from pathlib import Path
-from typing import List, Tuple, NamedTuple
+from collections import namedtuple
+from typing import List, Tuple
 
 
-class SmppConnections(NamedTuple):
-    sme_id: int
-    type: str
-    system_id: str
-    password: str
-    system_type: str
+SmppConnections = namedtuple('SmppConnections', 'sme_id, type, system_id, password, system_type')
+# class SmppConnections(namedtuple):
+#     sme_id: int
+#     type: str
+#     system_id: str
+#     password: str
+#     system_type: str
 
 
-class SmppConfig(NamedTuple):
-    connections: List[SmppConnections]
-    rules: List[NamedTuple]
 
+# class SmppConfig(NamedTuple):
+#     connections: List[SmppConnections]
+    # rules: List[NamedTuple]
+SmppConfig = namedtuple('SmppConfig', 'connections, rules')
 
 def argument_parser():
     parser = argparse.ArgumentParser(
@@ -50,7 +52,7 @@ def argument_parser():
     return parser.parse_args()
 
 
-def gt_conf_parser(file: Path) -> List[Tuple]:
+def gt_conf_parser(file):
     parsed_conf = []
     with open(file, 'r') as f_in:
         for line in f_in:
@@ -62,7 +64,7 @@ def gt_conf_parser(file: Path) -> List[Tuple]:
     return parsed_conf
 
 
-def sme_parser(line) -> SmppConnections:
+def sme_parser(line):
     params = re.sub(' +', ' ', line).split(' ')
     return SmppConnections(
         params[1],
@@ -73,7 +75,7 @@ def sme_parser(line) -> SmppConnections:
     )
 
 
-def smpp_conf_parser(file: Path) -> SmppConfig:
+def smpp_conf_parser(file):
     connections = []
     rules = []
     with open(file, 'r') as f_in:
@@ -85,13 +87,13 @@ def smpp_conf_parser(file: Path) -> SmppConfig:
     return SmppConfig(connections, rules)
 
 
-def check_gt_conf(parsed_conf) -> str:
+def check_gt_conf(parsed_conf):
     gt_ids = [values[0] for values in parsed_conf]
     unique_ids = list(set(gt_ids))
     for gt_id in unique_ids:
         gt_ids.remove(gt_id)
     if gt_ids:
-        return f'WARNING!\n{", ".join(gt_ids)} ids are duplicated'
+        return 'WARNING!\n{} ids are duplicated'.format(", ".join(gt_ids))
     return 'All looks good'
 
 
@@ -101,19 +103,18 @@ def check_smpp_conf(parsed_conf):
     for sme_id in unique_sme_ids:
         sme_ids.remove(sme_id)
     if sme_ids:
-        return f'WARNING\n{", ".join(sme_ids)} sme are duplicated'
+        return 'WARNING\n{} sme are duplicated'.format(", ".join(sme_ids))
     return 'All looks good'
 
 
 def get_file_path(file):
-    file = Path(file)
     if os.path.isabs(file):
         return file
     else:
         return os.path.abspath(file)
 
 
-def check_config_callback(arguments) -> str:
+def check_config_callback(arguments):
     print(arguments)
     file_path = get_file_path(arguments.file)
     if arguments.config == 'smpp':
