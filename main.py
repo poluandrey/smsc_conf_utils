@@ -65,7 +65,7 @@ def gt_conf_parser(file: Path) -> List[Tuple]:
 def sme_parser(line) -> SmppConnections:
     params = re.sub(' +', ' ', line).split(' ')
     return SmppConnections(
-        int(params[1]),
+        params[1],
         params[2].replace('"', ''),
         params[3].replace('"', ''),
         params[4].replace('"', ''),
