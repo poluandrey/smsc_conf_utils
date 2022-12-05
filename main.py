@@ -3,23 +3,14 @@ import os
 import re
 
 from collections import namedtuple
-from typing import List, Tuple
+
+# from typing import List, Tuple
 
 
 SmppConnections = namedtuple('SmppConnections', 'sme_id, type, system_id, password, system_type')
-# class SmppConnections(namedtuple):
-#     sme_id: int
-#     type: str
-#     system_id: str
-#     password: str
-#     system_type: str
 
-
-
-# class SmppConfig(NamedTuple):
-#     connections: List[SmppConnections]
-    # rules: List[NamedTuple]
 SmppConfig = namedtuple('SmppConfig', 'connections, rules')
+
 
 def argument_parser():
     parser = argparse.ArgumentParser(
@@ -52,9 +43,9 @@ def argument_parser():
     return parser.parse_args()
 
 
-def gt_conf_parser(file):
+def gt_conf_parser(in_file):
     parsed_conf = []
-    with open(file, 'r') as f_in:
+    with open(in_file, 'r') as f_in:
         for line in f_in:
             if re.search(r'^\d', line):
                 gt_params = re.sub(' +', ' ', line).split(' ')
@@ -75,10 +66,10 @@ def sme_parser(line):
     )
 
 
-def smpp_conf_parser(file):
+def smpp_conf_parser(in_file):
     connections = []
     rules = []
-    with open(file, 'r') as f_in:
+    with open(in_file, 'r') as f_in:
         for line in f_in:
             if re.search('^sme', line):
                 connections.append(sme_parser(line.strip()))
@@ -107,11 +98,11 @@ def check_smpp_conf(parsed_conf):
     return 'All looks good'
 
 
-def get_file_path(file):
-    if os.path.isabs(file):
-        return file
+def get_file_path(in_file):
+    if os.path.isabs(in_file):
+        return in_file
     else:
-        return os.path.abspath(file)
+        return os.path.abspath(in_file)
 
 
 def check_config_callback(arguments):
