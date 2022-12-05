@@ -106,14 +106,13 @@ def get_file_path(in_file):
 
 
 def check_config_callback(arguments):
-    print(arguments)
     file_path = get_file_path(arguments.file)
     if arguments.config == 'smpp':
         parsed_conf = smpp_conf_parser(file_path)
-        return check_smpp_conf(parsed_conf)
+        print(check_smpp_conf(parsed_conf))
     elif arguments.config == 'sccp_gt':
         parsed_conf = gt_conf_parser(file_path)
-        return check_gt_conf(parsed_conf)
+        print(check_gt_conf(parsed_conf))
 
 
 def db_loader(smpp_rules, gt_lis):
